@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Radius Terminal Interface</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+    }
+
+    body {
+      color: #00ffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ascii-wrapper {
+      display: flex;
+      white-space: pre;
+      transition: opacity 1s ease;
+      z-index: 2;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+    }
+
+    .ascii-radius {
+      font-size: 28px;
+      margin-left: -40px;
+      align-self: center;
+    }
+
+    pre {
+      margin: 0;
+      padding: 0;
+    }
+
+    .full-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 1;
+    }
+    
+    .hide {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+    
+    .show {
+      opacity: 1 !important;
+      z-index: 3;
+    }
+
+    /* Terminal Interface */
+    .terminal-interface {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+    }
+    
+    .terminal-container {
+      width: 80%;
+      max-width: 800px;
+      height: 60%;
+      background-color: #1a1a1a;
+      border-radius: 6px;
+      box-shadow: 0 4px 30px rgba(0, 255, 204, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .terminal-header {
+      height: 28px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+    
+    .terminal-controls {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .terminal-control {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .control-red {
+      background-color: #ff5f56;
+    }
+    
+    .control-yellow {
+      background-color: #ffbd2e;
+    }
+    
+    .control-green {
+      background-color: #27c93f;
+    }
+    
+    .terminal-title {
+      margin-left: 20px;
+      font-size: 12px;
+      color: #ddd;
+      flex-grow: 1;
+      text-align: center;
+    }
+    
+    .terminal-body {
+      flex-grow: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .terminal-output {
+      margin-bottom: 15px;
+      line-height: 1.5;
+      overflow-wrap: break-word;
+    }
+    
+    .terminal-prompt {
+      display: flex;
+      align-items: center;
+    }
+    
+    .terminal-user {
+      color: #00cc66;
+      margin-right: 5px;
+    }
+    
+    .terminal-at {
+      color: white;
+      margin-right: 5px;
+    }
+    
+    .terminal-host {
+      color: #00ccff;
+      margin-right: 5px;
+    }
+    
+    .terminal-path {
+      color: #cc99ff;
+      margin-right: 10px;
+    }
+    
+    .terminal-cursor {
+      margin-left: 5px;
+      display: inline-block;
+      width: 10px;
+      height: 20px;
+      background-color: white;
+      animation: blink 1s step-end infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    
+    .terminal-input {
+      background: transparent;
+      border: none;
+      color: white;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      caret-color: transparent;
+      flex-grow: 1;
+      outline: none;
+      padding: 0;
+    }
+    
+    /* MacOS Interface Styles */
+    .macos-interface {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      background-color: #f5f5f7;
+      color: black;
+    }
+    
+    .macos-interface.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    /* All macOS styles from the original code */
+    .macbook {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .macbook-screen {
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .display {
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(135deg, #4158D0, #C850C0, #FFCC70);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-bar {
+      height: 25px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .apple-logo {
+      width: 15px;
+      height: 15px;
+      background-color: #000;
+      border-radius: 50%;
+      margin-right: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .menu-item {
+      margin-right: 15px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    .dock-container {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 60px;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .dock-item {
+      width: 50px;
+      height: 50px;
+      margin: 0 5px;
+      border-radius: 10px;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      color: black;
+    }
+
+    .dock-item:hover {
+      transform: scale(1.1);
+    }
+
+    .dock-item i {
+      font-size: 30px;
+    }
+
+    .app-1 {
+      background: linear-gradient(to bottom right, #FF6B6B, #FF8E53);
+    }
+
+    .app-2 {
+      background: linear-gradient(to bottom right, #56CCF2, #2F80ED);
+    }
+
+    .app-3 {
+      background: linear-gradient(to bottom right, #A17FE0, #5D26C1);
+    }
+
+    .app-window {
+      position: absolute;
+      width: 70%;
+      height: 70%;
+      background-color: #fff;
+      border-radius: 10px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+      overflow: hidden;
+      z-index: 10;
+      color: black;
+    }
+
+    .window-header {
+      height: 25px;
+      background-color: #eee;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    .control {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .control-red {
+      background-color: #FF5F56;
+    }
+
+    .control-yellow {
+      background-color: #FFBD2E;
+    }
+
+    .control-green {
+      background-color: #27C93F;
+    }
+
+    .window-title {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .window-content {
+      height: calc(100% - 25px);
+      padding: 20px;
+      overflow: auto;
+      color: black;
+    }
+
+    .macbook-body {
+      display: none;
+    }
+
+    .date-time {
+      position: absolute;
+      top: 5px;
+      right: 15px;
+      font-size: 12px;
+      color: #333;
+    }
+
+    /* App-specific window styles */
+    .app-1-window .window-header {
+      background: linear-gradient(to right, #FF6B6B, #FF8E53);
+    }
+
+    .app-2-window .window-header {
+      background: linear-gradient(to right, #56CCF2, #2F80ED);
+    }
+
+    .app-3-window .window-header {
+      background: linear-gradient(to right, #A17FE0, #5D26C1);
+    }
+  </style>
+</head>
+<body>
+  <div id="ascii" class="ascii-wrapper">
+    <pre class="ascii-circle">
+                                                    ::----::
+                                      :-*%@@@@@@@@@@@@@@@@%*-:
+                          :=*%%%#+::=#@@@@@@@%#*++==++**%@@@@@@@#=:
+                        :#@@@@@@@@@@@@@@#-:                :-*@@@@@%=
+                      :%@@%=    -#@@@*                          =%@@@@*:
+                      *@@%:      +@@%:                           :+@@@@*:
+                      #@@*       -@@@-                              -@@@@=
+                      =@@@-     :#@@%:                                +@@@#
+                      :*@@@#+=+#@@@@=                                  :%@@%-
+                      :%@@@@@@@@@@@@@#:                                 :#@@%-
+                      %@@# :===:  -%@@@*:                                 #@@%:
+                     #@@%#          =%@@@+                                 %@@#
+                    =@@@-#            +@@@@=                               :#@@+
+                    @@@                 -@@@=  -@@@-                        %%@@-                                      
+                   =@@@-                 :#@@@@@@@@@@@%-                    -%@@=
+                  =+@@%:                   +@@@%-::-%@@@+                   :#@@*
+                  =*@@#                   -@@@-      -@@@-                   #@@*
+                  =*@@#-                  +@@%        %@@+                   *@@#:
+                  =*@@#                   -@@@-      -@@@-                   #@@*
+                  =+@@%:                   +@@@%-::-#@@@+                   :#@@*
+                  ==@@@-                    -%@@@@@@@@%=                    -%@@=
+                  =:#@@                       :-+*#+-:                      +@@%:
+                    =@@@-                                                  :@@@+
+                    =%@@%                                                  %@@%
+                      %@@#                                                #@@%:
+                      :%@@#:                                            :#@@%-
+                       -%@@%:                                          :%@@%-
+                         #@@@+                                         @@@#:
+                          =@@@@-                                     @@@@=
+                            :*@@@@=:                              :=@@@@#:
+                              :*@@@@%=                          =%@@@@*:
+                                -%@@@@@*-                   -*@@@@@@=
+                                   :+#@@@@@@@%*++====++*%@@@@@@@#+:
+                                      :=*%@@@@@@@@@@@@@@@@%*=:
+                                              ::-==--:
+    </pre>
+    <pre class="ascii-radius">
+                          /$$ /$$                    
+                         | $$|__/                    
+  /$$$$$$  /$$$$$$   /$$$$$$$ /$$ /$$   /$$  /$$$$$$$
+ /$$__  $$|____  $$ /$$__  $$| $$| $$  | $$ /$$_____/
+| $$  \__/ /$$$$$$$| $$  | $$| $$| $$  | $$|  $$$$$$ 
+| $$      /$$__  $$| $$  | $$| $$| $$  | $$ \____  $$
+| $$     |  $$$$$$$|  $$$$$$$| $$|  $$$$$$/ /$$$$$$$/
+|__/      \_______/ \_______/|__/ \______/ |_______/ 
+    </pre>
+  </div>
+
+  <!-- Replace with your actual image URL -->
+  <img id="backgroundImage" class="full-image" src="src/radiusI.png" alt="Radius Background Image" />
+  
+  <!-- Terminal Interface -->
+  <div id="terminalInterface" class="terminal-interface">
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <div class="terminal-controls">
+          <div class="terminal-control control-red"></div>
+          <div class="terminal-control control-yellow"></div>
+          <div class="terminal-control control-green"></div>
+        </div>
+        <div class="terminal-title">radius@terminal: ~</div>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <div class="terminal-output" id="terminalOutput">
+          <p>Welcome to Radius Terminal v1.0.0</p>
+          <p>Copyright © 2025 Radius Industies. All rights reserved.</p>
+          <p>Type 'help' for a list of available commands or 'enter' to access MacOS interface.</p>
+          <br>
+        </div>
+        <div class="terminal-prompt">
+          <span class="terminal-user">radius</span>
+          <span class="terminal-at">@</span>
+          <span class="terminal-host">terminal</span>
+          <span class="terminal-path">:~$</span>
+          <input type="text" id="terminalInput" class="terminal-input" autofocus>
+          <span class="terminal-cursor" id="cursor"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- MacOS Interface -->
+  <div id="macosInterface" class="macos-interface">
+    <div class="macbook">
+      <div class="macbook-screen">
+        <div class="display">
+          <div class="menu-bar">
+            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/lol.svg"> </div>
+            <div class="menu-item">Blog</div>
+            <div class="menu-item">AI chat</div>
+            <div class="menu-item">Contact</div>
+            <div class="menu-item">Resume</div>
+            <div class="menu-item">Search</div>
+            <div class="menu-item">Playlist</div>
+            <div class="menu-item">Help</div>
+            <div class="date-time" id="dateTime"></div>
+          </div>
+
+          <!-- App Windows -->
+          <div class="app-window app-1-window">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control control-red"></div>
+                <div class="control control-yellow"></div>
+                <div class="control control-green"></div>
+              </div>
+              <div class="window-title">App 1</div>
+            </div>
+            <div class="window-content">
+              <h2>App 1 Content</h2>
+              <p>This is the content area for App 1.</p>
+            </div>
+          </div>
+
+          <div class="app-window app-2-window">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control control-red"></div>
+                <div class="control control-yellow"></div>
+                <div class="control control-green"></div>
+              </div>
+              <div class="window-title">App 2</div>
+            </div>
+            <div class="window-content">
+              <h2>App 2 Content</h2>
+              <p>This is the content area for App 2.</p>
+            </div>
+          </div>
+
+          <div class="app-window app-3-window">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control control-red"></div>
+                <div class="control control-yellow"></div>
+                <div class="control control-green"></div>
+              </div>
+              <div class="window-title">App 3</div>
+            </div>
+            <div class="window-content">
+              <h2>App 3 Content</h2>
+              <p>Example Text.</p>
+            </div>
+          </div>
+
+          <div class="dock-container">
+            <div class="dock-item app-1" id="app1">A1</div>
+            <div class="dock-item app-2" id="app2">A2</div>
+            <div class="dock-item app-3" id="app3">A3</div>
+          </div>
+        </div>
+      </div>
+      <div class="macbook-body">
+        <div class="touchpad"></div>
+        <div class="macbook-notch"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple fade animation for ASCII art → Background image → Terminal
+    document.addEventListener('DOMContentLoaded', function() {
+      // First hide ASCII art and show background after 1 second
+      setTimeout(function() {
+        document.getElementById('ascii').classList.add('hide');
+        document.getElementById('backgroundImage').classList.add('show');
+        
+        // Then show the terminal after another 1 second
+        setTimeout(function() {
+          document.getElementById('backgroundImage').classList.remove('show');
+          document.getElementById('terminalInterface').classList.add('show');
+          document.getElementById('terminalInterface').style.opacity = '1';
+          document.getElementById('terminalInterface').style.pointerEvents = 'auto';
+          document.getElementById('terminalInput').focus();
+        }, 1000);
+      }, 1000);
+    });
+    
+    // Terminal input handling
+    const terminalInput = document.getElementById('terminalInput');
+    const terminalOutput = document.getElementById('terminalOutput');
+    const terminalBody = document.getElementById('terminalBody');
+    
+    terminalInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const command = terminalInput.value.trim().toLowerCase();
+        
+        // Add the command to terminal output
+        terminalOutput.innerHTML += `<p><span class="terminal-user">radius</span><span class="terminal-at">@</span><span class="terminal-host">terminal</span><span class="terminal-path">:~$</span> ${command}</p>`;
+        
+        // Process the command
+        if (command === 'enter') {
+          terminalOutput.innerHTML += `<p>Launching MacOS interface...</p>`;
+          terminalBody.scrollTop = terminalBody.scrollHeight;
+          
+          // Show MacOS interface after a short delay
+          setTimeout(function() {
+            document.getElementById('terminalInterface').style.opacity = '0';
+            document.getElementById('terminalInterface').style.pointerEvents = 'none';
+            document.getElementById('macosInterface').classList.add('show');
+            
+            // Initialize MacOS date and time
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            
+            // Initialize app windows
+            initializeAppWindows();
+          }, 1000);
+        } 
+        else if (command === 'help') {
+          terminalOutput.innerHTML += `
+            <p>Available commands:</p>
+            <p>  help    - Display this help information</p>
+            <p>  enter   - Access the MacOS interface</p>
+            <p>  clear   - Clear the terminal screen</p>
+            <p>  about   - Display information about Radius</p>
+          `;
+        }
+        else if (command === 'clear') {
+          terminalOutput.innerHTML = '';
+        }
+        else if (command === 'about') {
+          terminalOutput.innerHTML += `
+            <p>Radius Industries - Innovating the future of technology</p>
+            <p>A cutting-edge tech company focused on creating seamless digital experiences.</p>
+            <p>Founded in 2023, Radius Industries has been at the forefront of technological innovation.</p>
+          `;
+        }
+        else if (command === '') {
+          // Do nothing for empty command
+        }
+        else {
+          terminalOutput.innerHTML += `<p>Command not found: ${command}. Type 'help' for available commands.</p>`;
+        }
+        
+        // Clear input and scroll to bottom
+        terminalInput.value = '';
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+      }
+    });
+    
+    // Update date and time in MacOS interface
+    function updateDateTime() {
+      const now = new Date();
+      const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById('dateTime').textContent = now.toLocaleDateString('en-US', options);
+    }
+    
+    // Initialize app windows in MacOS interface
+    function initializeAppWindows() {
+      // Set initial window properties
+      const windows = document.querySelectorAll('.app-window');
+      windows.forEach(function(window) {
+        window.style.display = 'none';
+        window.style.position = 'absolute';
+      });
+      
+      // Set up app click handlers
+      document.getElementById('app1').addEventListener('click', function() {
+        toggleWindow(document.querySelector('.app-1-window'));
+      });
+      
+      document.getElementById('app2').addEventListener('click', function() {
+        toggleWindow(document.querySelector('.app-2-window'));
+      });
+      
+      document.getElementById('app3').addEventListener('click', function() {
+        toggleWindow(document.querySelector('.app-3-window'));
+      });
+      
+      // Set up window dragging and controls
+      setupWindowControls();
+    }
+    
+    // Toggle window visibility in MacOS interface
+    function toggleWindow(window) {
+      if (window.style.display === 'block') {
+        window.style.display = 'none';
+      } else {
+        // Hide all windows first
+        const windows = document.querySelectorAll('.app-window');
+        windows.forEach(function(w) {
+          w.style.display = 'none';
+        });
+        
+        // Show the selected window
+        window.style.display = 'block';
+      }
+    }
+    
+    // Setup window controls and dragging in MacOS interface
+    function setupWindowControls() {
+      const windows = document.querySelectorAll('.app-window');
+      
+      windows.forEach(function(window) {
+        const header = window.querySelector('.window-header');
+        let isDragging = false;
+        let offsetX, offsetY;
+        
+        // Setup dragging
+        header.addEventListener('mousedown', function(e) {
+          isDragging = true;
+          offsetX = e.clientX - window.getBoundingClientRect().left;
+          offsetY = e.clientY - window.getBoundingClientRect().top;
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+          if (isDragging) {
+            const display = document.querySelector('.display');
+            const displayRect = display.getBoundingClientRect();
+            
+            let newX = e.clientX - offsetX - displayRect.left;
+            let newY = e.clientY - offsetY - displayRect.top;
+            
+            // Boundary checks to keep window inside display
+            const maxX = displayRect.width - window.offsetWidth;
+            const maxY = displayRect.height - window.offsetHeight;
+            
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+            
+            window.style.left = `${newX}px`;
+            window.style.top = `${newY}px`;
+            window.style.transform = 'none';
+          }
+        });
+        
+        document.addEventListener('mouseup', function() {
+          isDragging = false;
+        });
+        
+        // Close window when red button is clicked
+        const redButton = window.querySelector('.control-red');
+        redButton.addEventListener('click', function() {
+          window.style.display = 'none';
+        });
+      });
+    }
+  </script>
+</body>
+</html>
