@@ -257,14 +257,21 @@
     }
 
     .apple-logo {
-      width: 15px;
-      height: 15px;
-      background-color: #000;
+      width: 20px;
+      height: 20px;
+      background-color: transparent;
       border-radius: 50%;
       margin-right: 15px;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
+    }
+    
+    .apple-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .menu-item {
@@ -336,6 +343,14 @@
       overflow: hidden;
       z-index: 10;
       color: black;
+      transition: all 0.3s ease;
+    }
+    
+    .app-window.fullscreen {
+      width: 100%;
+      height: calc(100% - 25px);
+      top: calc(25px + (100% - 25px) / 2);
+      border-radius: 0;
     }
 
     .window-header {
@@ -345,6 +360,10 @@
       display: flex;
       align-items: center;
       padding: 0 10px;
+    }
+    
+    .fullscreen .window-header {
+      border-radius: 0;
     }
 
     .window-controls {
@@ -356,6 +375,7 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
+      cursor: pointer;
     }
 
     .control-red {
@@ -407,6 +427,11 @@
 
     .app-3-window .window-header {
       background: linear-gradient(to right, #A17FE0, #5D26C1);
+    }
+    
+    /* Z-index for active window */
+    .app-window.active {
+      z-index: 15;
     }
   </style>
 </head>
@@ -478,7 +503,7 @@
       <div class="terminal-body" id="terminalBody">
         <div class="terminal-output" id="terminalOutput">
           <p>Welcome to Radius Terminal v1.0.0</p>
-          <p>Copyright © 2025 Radius Industies. All rights reserved.</p>
+          <p>Copyright © 2025 Radius Industries. All rights reserved.</p>
           <p>Type 'help' for a list of available commands or 'enter' to access MacOS interface.</p>
           <br>
         </div>
@@ -500,7 +525,7 @@
       <div class="macbook-screen">
         <div class="display">
           <div class="menu-bar">
-            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/lol.svg"> </div>
+            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/download.svg"> </div>
             <div class="menu-item">Blog</div>
             <div class="menu-item">AI chat</div>
             <div class="menu-item">Contact</div>
@@ -512,7 +537,7 @@
           </div>
 
           <!-- App Windows -->
-          <div class="app-window app-1-window">
+          <div class="app-window app-1-window" id="window1">
             <div class="window-header">
               <div class="window-controls">
                 <div class="control control-red"></div>
@@ -527,7 +552,7 @@
             </div>
           </div>
 
-          <div class="app-window app-2-window">
+          <div class="app-window app-2-window" id="window2">
             <div class="window-header">
               <div class="window-controls">
                 <div class="control control-red"></div>
@@ -542,7 +567,7 @@
             </div>
           </div>
 
-          <div class="app-window app-3-window">
+          <div class="app-window app-3-window" id="window3">
             <div class="window-header">
               <div class="window-controls">
                 <div class="control control-red"></div>
@@ -662,43 +687,68 @@
     
     // Initialize app windows in MacOS interface
     function initializeAppWindows() {
-      // Set initial window properties
+      // Set initial window properties for each window
       const windows = document.querySelectorAll('.app-window');
-      windows.forEach(function(window) {
+      
+      // Position windows in different locations
+      const positions = [
+        { left: '30%', top: '40%' },
+        { left: '50%', top: '50%' },
+        { left: '70%', top: '60%' }
+      ];
+      
+      windows.forEach(function(window, index) {
+        // Set initial position
+        if (positions[index]) {
+          window.style.left = positions[index].left;
+          window.style.top = positions[index].top;
+        }
+        
         window.style.display = 'none';
         window.style.position = 'absolute';
+        
+        // Make the window active when clicked
+        window.addEventListener('mousedown', function() {
+          makeWindowActive(window);
+        });
       });
       
       // Set up app click handlers
       document.getElementById('app1').addEventListener('click', function() {
-        toggleWindow(document.querySelector('.app-1-window'));
+        toggleAppWindow(document.getElementById('window1'));
       });
       
       document.getElementById('app2').addEventListener('click', function() {
-        toggleWindow(document.querySelector('.app-2-window'));
+        toggleAppWindow(document.getElementById('window2'));
       });
       
       document.getElementById('app3').addEventListener('click', function() {
-        toggleWindow(document.querySelector('.app-3-window'));
+        toggleAppWindow(document.getElementById('window3'));
       });
       
-      // Set up window dragging and controls
+      // Set up window controls and dragging
       setupWindowControls();
     }
     
+    // Make a window active (bring to front)
+    function makeWindowActive(window) {
+      // Remove active class from all windows
+      document.querySelectorAll('.app-window').forEach(function(w) {
+        w.classList.remove('active');
+      });
+      
+      // Add active class to this window
+      window.classList.add('active');
+    }
+    
     // Toggle window visibility in MacOS interface
-    function toggleWindow(window) {
+    function toggleAppWindow(window) {
       if (window.style.display === 'block') {
         window.style.display = 'none';
       } else {
-        // Hide all windows first
-        const windows = document.querySelectorAll('.app-window');
-        windows.forEach(function(w) {
-          w.style.display = 'none';
-        });
-        
-        // Show the selected window
+        // Show the window (no longer hiding other windows)
         window.style.display = 'block';
+        makeWindowActive(window);
       }
     }
     
@@ -713,9 +763,17 @@
         
         // Setup dragging
         header.addEventListener('mousedown', function(e) {
+          // Skip if clicking on a control button
+          if (e.target.classList.contains('control')) {
+            return;
+          }
+          
           isDragging = true;
           offsetX = e.clientX - window.getBoundingClientRect().left;
           offsetY = e.clientY - window.getBoundingClientRect().top;
+          
+          // Make this window active
+          makeWindowActive(window);
         });
         
         document.addEventListener('mousemove', function(e) {
@@ -748,7 +806,43 @@
         redButton.addEventListener('click', function() {
           window.style.display = 'none';
         });
+        
+        // Minimize window when yellow button is clicked (just hide for now)
+        const yellowButton = window.querySelector('.control-yellow');
+        yellowButton.addEventListener('click', function() {
+          window.style.display = 'none';
+        });
+        
+        // Fullscreen toggle when green button is clicked
+        const greenButton = window.querySelector('.control-green');
+        greenButton.addEventListener('click', function() {
+          toggleFullscreen(window);
+        });
       });
+    }
+    
+    // Toggle fullscreen mode for a window
+    function toggleFullscreen(window) {
+      if (window.classList.contains('fullscreen')) {
+        // Exit fullscreen mode
+        window.classList.remove('fullscreen');
+        
+        // Reset position
+        window.style.left = '50%';
+        window.style.top = '50%';
+        window.style.transform = 'translate(-50%, -50%)';
+      } else {
+        // Enter fullscreen mode
+        window.classList.add('fullscreen');
+        
+        // Set position for fullscreen
+        window.style.left = '50%';
+        window.style.top = 'calc(25px + (100% - 25px) / 2)';
+        window.style.transform = 'translate(-50%, -50%)';
+      }
+      
+      // Make sure this window is active
+      makeWindowActive(window);
     }
   </script>
 </body>
