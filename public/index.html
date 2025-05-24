@@ -376,6 +376,17 @@
       height: 12px;
       border-radius: 50%;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.6);
+      transition: color 0.2s ease;
+    }
+    
+    .control:hover {
+      color: rgba(0, 0, 0, 0.8);
     }
 
     .control-red {
@@ -512,8 +523,10 @@
           <span class="terminal-at">@</span>
           <span class="terminal-host">terminal</span>
           <span class="terminal-path">:~$</span>
-          <input type="text" id="terminalInput" class="terminal-input" autofocus>
-          <span class="terminal-cursor" id="cursor"></span>
+          <div class="terminal-input-container">
+            <input type="text" id="terminalInput" class="terminal-input" autofocus>
+            <span class="terminal-cursor" id="cursor"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -540,9 +553,9 @@
           <div class="app-window app-1-window" id="window1">
             <div class="window-header">
               <div class="window-controls">
-                <div class="control control-red"></div>
-                <div class="control control-yellow"></div>
-                <div class="control control-green"></div>
+                <div class="control control-red">×</div>
+                <div class="control control-yellow">−</div>
+                <div class="control control-green">+</div>
               </div>
               <div class="window-title">App 1</div>
             </div>
@@ -555,9 +568,9 @@
           <div class="app-window app-2-window" id="window2">
             <div class="window-header">
               <div class="window-controls">
-                <div class="control control-red"></div>
-                <div class="control control-yellow"></div>
-                <div class="control control-green"></div>
+                <div class="control control-red">×</div>
+                <div class="control control-yellow">−</div>
+                <div class="control control-green">+</div>
               </div>
               <div class="window-title">App 2</div>
             </div>
@@ -570,9 +583,9 @@
           <div class="app-window app-3-window" id="window3">
             <div class="window-header">
               <div class="window-controls">
-                <div class="control control-red"></div>
-                <div class="control control-yellow"></div>
-                <div class="control control-green"></div>
+                <div class="control control-red">×</div>
+                <div class="control control-yellow">−</div>
+                <div class="control control-green">+</div>
               </div>
               <div class="window-title">App 3</div>
             </div>
@@ -619,6 +632,34 @@
     const terminalInput = document.getElementById('terminalInput');
     const terminalOutput = document.getElementById('terminalOutput');
     const terminalBody = document.getElementById('terminalBody');
+    const cursor = document.getElementById('cursor');
+    
+    // Function to update cursor position
+    function updateCursorPosition() {
+      const inputValue = terminalInput.value;
+      const cursorPosition = terminalInput.selectionStart;
+      
+      // Create a canvas to measure text width more accurately
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      context.font = '16px "Courier New", monospace';
+      
+      // Measure the width of text before cursor
+      const textBeforeCursor = inputValue.substring(0, cursorPosition);
+      const textWidth = context.measureText(textBeforeCursor).width;
+      
+      // Position the cursor
+      cursor.style.left = textWidth + 'px';
+    }
+    
+    // Update cursor position on input and cursor movement
+    terminalInput.addEventListener('input', updateCursorPosition);
+    terminalInput.addEventListener('keyup', updateCursorPosition);
+    terminalInput.addEventListener('click', updateCursorPosition);
+    terminalInput.addEventListener('focus', updateCursorPosition);
+    
+    // Initial cursor position
+    updateCursorPosition();
     
     terminalInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -759,7 +800,7 @@
       windows.forEach(function(window) {
         const header = window.querySelector('.window-header');
         let isDragging = false;
-        let offsetX, offsetY;
+        let startX, startY, initialLeft, initialTop;
         
         // Setup dragging
         header.addEventListener('mousedown', function(e) {
@@ -768,54 +809,96 @@
             return;
           }
           
+          // Prevent default behaviors
+          e.preventDefault();
+          
           isDragging = true;
-          offsetX = e.clientX - window.getBoundingClientRect().left;
-          offsetY = e.clientY - window.getBoundingClientRect().top;
+          
+          // Store initial mouse position
+          startX = e.clientX;
+          startY = e.clientY;
+          
+          // Store initial window position
+          initialLeft = parseInt(window.style.left) || parseInt(window.offsetLeft);
+          initialTop = parseInt(window.style.top) || parseInt(window.offsetTop);
           
           // Make this window active
           makeWindowActive(window);
+          
+          // Visual feedback
+          header.style.cursor = 'grabbing';
+          document.body.style.userSelect = 'none';
+          
+          // Attach mouse move and up events to document
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
         });
         
-        document.addEventListener('mousemove', function(e) {
-          if (isDragging) {
-            const display = document.querySelector('.display');
-            const displayRect = display.getBoundingClientRect();
-            
-            let newX = e.clientX - offsetX - displayRect.left;
-            let newY = e.clientY - offsetY - displayRect.top;
-            
-            // Boundary checks to keep window inside display
-            const maxX = displayRect.width - window.offsetWidth;
-            const maxY = displayRect.height - window.offsetHeight;
-            
-            newX = Math.max(0, Math.min(newX, maxX));
-            newY = Math.max(0, Math.min(newY, maxY));
-            
-            window.style.left = `${newX}px`;
-            window.style.top = `${newY}px`;
-            window.style.transform = 'none';
-          }
-        });
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          
+          e.preventDefault();
+          
+          // Calculate how far the mouse has moved
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+          
+          // Calculate new position
+          let newLeft = initialLeft + deltaX;
+          let newTop = initialTop + deltaY;
+          
+          // Get display boundaries
+          const display = document.querySelector('.display');
+          const displayRect = display.getBoundingClientRect();
+          const windowRect = window.getBoundingClientRect();
+          
+          // Boundary checks
+          const minLeft = 0;
+          const minTop = 25; // Account for menu bar
+          const maxLeft = displayRect.width - windowRect.width;
+          const maxTop = displayRect.height - windowRect.height;
+          
+          newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+          newTop = Math.max(minTop, Math.min(newTop, maxTop));
+          
+          // Apply position immediately
+          window.style.left = newLeft + 'px';
+          window.style.top = newTop + 'px';
+          window.style.transform = 'none';
+        }
         
-        document.addEventListener('mouseup', function() {
+        function onMouseUp(e) {
+          if (!isDragging) return;
+          
           isDragging = false;
-        });
+          
+          // Reset styles
+          header.style.cursor = '';
+          document.body.style.userSelect = '';
+          
+          // Remove event listeners
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
         
         // Close window when red button is clicked
         const redButton = window.querySelector('.control-red');
-        redButton.addEventListener('click', function() {
+        redButton.addEventListener('click', function(e) {
+          e.stopPropagation();
           window.style.display = 'none';
         });
         
-        // Minimize window when yellow button is clicked (just hide for now)
+        // Minimize window when yellow button is clicked
         const yellowButton = window.querySelector('.control-yellow');
-        yellowButton.addEventListener('click', function() {
+        yellowButton.addEventListener('click', function(e) {
+          e.stopPropagation();
           window.style.display = 'none';
         });
         
         // Fullscreen toggle when green button is clicked
         const greenButton = window.querySelector('.control-green');
-        greenButton.addEventListener('click', function() {
+        greenButton.addEventListener('click', function(e) {
+          e.stopPropagation();
           toggleFullscreen(window);
         });
       });
