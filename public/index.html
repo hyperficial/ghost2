@@ -329,6 +329,10 @@
       background: linear-gradient(to bottom right, #A17FE0, #5D26C1);
     }
 
+    .app-4 {
+      background: linear-gradient(to bottom right, #4A90E2, #7B68EE);
+    }
+
     .app-window {
       position: absolute;
       width: 70%;
@@ -343,7 +347,8 @@
       overflow: hidden;
       z-index: 10;
       color: black;
-      transition: all 0.3s ease;
+      transition: none;
+      will-change: transform;
     }
     
     .app-window.fullscreen {
@@ -440,9 +445,252 @@
       background: linear-gradient(to right, #A17FE0, #5D26C1);
     }
     
-    /* Z-index for active window */
-    .app-window.active {
-      z-index: 15;
+    /* Blog Window Specific Styles */
+    .blog-window .window-header {
+      background: linear-gradient(to right, #4A90E2, #7B68EE);
+    }
+    
+    .blog-window-content {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .blog-content-header {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px 30px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .blog-window-title {
+      font-size: 32px;
+      font-weight: 600;
+      color: #1d1d1f;
+      text-align: center;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .blog-window-subtitle {
+      font-size: 16px;
+      font-weight: 400;
+      color: #86868b;
+      text-align: center;
+      margin: 0;
+      line-height: 1.4;
+    }
+    
+    .blog-posts-container {
+      padding: 20px;
+      overflow-y: auto;
+      height: calc(100% - 120px);
+    }
+    
+    .blog-post-compact {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .blog-post-compact:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .blog-post-compact:last-child {
+      margin-bottom: 0;
+    }
+    
+    .blog-post-title-compact {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin: 8px 0 8px 0;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
+    }
+    
+    .blog-post-excerpt-compact {
+      font-size: 14px;
+      color: #515154;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    
+    .blog-tag-compact {
+      background: #f5f5f7;
+      color: #1d1d1f;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      margin-right: 6px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    
+    /* Blog Page Styles */
+    .blog-page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      overflow-y: auto;
+    }
+    
+    .blog-page.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .blog-header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    
+    .blog-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .blog-logo {
+      font-size: 28px;
+      font-weight: 300;
+      color: #1d1d1f;
+      letter-spacing: -0.5px;
+    }
+    
+    .blog-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f5f5f7;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      color: #1d1d1f;
+      transition: all 0.2s ease;
+    }
+    
+    .blog-close:hover {
+      background: #e8e8ed;
+      transform: scale(1.05);
+    }
+    
+    .blog-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+    
+    .blog-title {
+      font-size: 48px;
+      font-weight: 600;
+      color: #1d1d1f;
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    
+    .blog-subtitle {
+      font-size: 21px;
+      font-weight: 400;
+      color: #86868b;
+      text-align: center;
+      margin-bottom: 60px;
+      line-height: 1.4;
+    }
+    
+    .blog-posts {
+      display: grid;
+      gap: 40px;
+    }
+    
+    .blog-post {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 18px;
+      padding: 40px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .blog-post:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .blog-post-date {
+      font-size: 14px;
+      color: #86868b;
+      font-weight: 400;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .blog-post-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    
+    .blog-post-excerpt {
+      font-size: 17px;
+      color: #515154;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    
+    .blog-post-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .blog-tag {
+      background: #f5f5f7;
+      color: #1d1d1f;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .blog-footer {
+      text-align: center;
+      padding: 60px 40px 40px;
+      color: #86868b;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -532,13 +780,89 @@
     </div>
   </div>
   
+  <!-- Blog Page -->
+  <div id="blogPage" class="blog-page">
+    <div class="blog-header">
+      <div class="blog-nav">
+        <div class="blog-logo">Radius Blog</div>
+        <div class="blog-close" id="blogClose">×</div>
+      </div>
+    </div>
+    
+    <div class="blog-container">
+      <h1 class="blog-title">Think Different</h1>
+      <p class="blog-subtitle">Exploring technology, innovation, and the future of human creativity</p>
+      
+      <div class="blog-posts">
+        <article class="blog-post">
+          <div class="blog-post-date">January 15, 2025</div>
+          <h2 class="blog-post-title">The Art of Minimalist Design</h2>
+          <p class="blog-post-excerpt">In a world cluttered with information and visual noise, the power of simplicity becomes more evident than ever. Minimalist design isn't just about removing elements—it's about finding the essence of what truly matters and presenting it with clarity and purpose.</p>
+          <div class="blog-post-tags">
+            <span class="blog-tag">Design</span>
+            <span class="blog-tag">Minimalism</span>
+            <span class="blog-tag">UX</span>
+          </div>
+        </article>
+        
+        <article class="blog-post">
+          <div class="blog-post-date">January 8, 2025</div>
+          <h2 class="blog-post-title">Terminal Interfaces: The Return of Text</h2>
+          <p class="blog-post-excerpt">While graphical interfaces dominate our digital landscape, there's a growing appreciation for the elegance and efficiency of terminal-based interactions. Modern developers are rediscovering the power of command-line tools and text-based workflows.</p>
+          <div class="blog-post-tags">
+            <span class="blog-tag">Terminal</span>
+            <span class="blog-tag">Development</span>
+            <span class="blog-tag">Productivity</span>
+          </div>
+        </article>
+        
+        <article class="blog-post">
+          <div class="blog-post-date">December 28, 2024</div>
+          <h2 class="blog-post-title">Building Seamless User Experiences</h2>
+          <p class="blog-post-excerpt">Great user experiences are invisible. They flow naturally, anticipate needs, and remove friction at every step. In this exploration of UX design principles, we dive deep into creating interfaces that feel intuitive and effortless.</p>
+          <div class="blog-post-tags">
+            <span class="blog-tag">UX Design</span>
+            <span class="blog-tag">Interface</span>
+            <span class="blog-tag">User Research</span>
+          </div>
+        </article>
+        
+        <article class="blog-post">
+          <div class="blog-post-date">December 20, 2024</div>
+          <h2 class="blog-post-title">The Philosophy of Technology</h2>
+          <p class="blog-post-excerpt">Technology is not neutral. Every line of code, every design decision, every feature carries with it a set of values and assumptions about how the world should work. As creators, we have a responsibility to think deeply about the tools we build.</p>
+          <div class="blog-post-tags">
+            <span class="blog-tag">Philosophy</span>
+            <span class="blog-tag">Ethics</span>
+            <span class="blog-tag">Technology</span>
+          </div>
+        </article>
+        
+        <article class="blog-post">
+          <div class="blog-post-date">December 12, 2024</div>
+          <h2 class="blog-post-title">Crafting Digital Experiences</h2>
+          <p class="blog-post-excerpt">The intersection of art and technology has never been more exciting. From interactive installations to immersive web experiences, digital artists are pushing the boundaries of what's possible in the browser and beyond.</p>
+          <div class="blog-post-tags">
+            <span class="blog-tag">Digital Art</span>
+            <span class="blog-tag">Web Design</span>
+            <span class="blog-tag">Interactive</span>
+          </div>
+        </article>
+      </div>
+      
+      <div class="blog-footer">
+        © 2025 Radius Industries. All rights reserved.
+      </div>
+    </div>
+  </div>
+  
   <!-- MacOS Interface -->
   <div id="macosInterface" class="macos-interface">
     <div class="macbook">
       <div class="macbook-screen">
         <div class="display">
           <div class="menu-bar">
-            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/download.svg"> </div>
+            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/lol.svg"> </div>
             <div class="menu-item">Blog</div>
             <div class="menu-item">AI chat</div>
             <div class="menu-item">Contact</div>
@@ -595,10 +919,41 @@
             </div>
           </div>
 
+          <!-- Blog Window -->
+          <div class="app-window blog-window" id="blogWindow">
+            <div class="window-header">
+              <div class="window-controls">
+                <div class="control control-red">×</div>
+                <div class="control control-yellow">−</div>
+                <div class="control control-green">+</div>
+              </div>
+              <div class="window-title">Radius Blog</div>
+            </div>
+            <div class="window-content blog-window-content">
+              <div class="blog-content-header">
+                <h1 class="blog-window-title">Think Different</h1>
+                <p class="blog-window-subtitle">Exploring technology, innovation, and the future of human creativity</p>
+              </div>
+              
+              <div class="blog-posts-container">
+                <article class="blog-post-compact">
+                  <div class="blog-post-date">January 24, 2025</div>
+                  <h2 class="blog-post-title-compact">Example</h2>
+                  <p class="blog-post-excerpt-compact">idk what to write here</p>
+                  <div class="blog-post-tags">
+                    <span class="blog-tag-compact">Example</span>
+                    <span class="blog-tag-compact">Demo</span>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
           <div class="dock-container">
             <div class="dock-item app-1" id="app1">A1</div>
             <div class="dock-item app-2" id="app2">A2</div>
             <div class="dock-item app-3" id="app3">A3</div>
+            <div class="dock-item app-4" id="blogApp">📝</div>
           </div>
         </div>
       </div>
@@ -685,6 +1040,9 @@
             
             // Initialize app windows
             initializeAppWindows();
+            
+            // No need for separate blog setup since it's now a regular window
+            // setupBlogPage();
           }, 1000);
         } 
         else if (command === 'help') {
@@ -733,9 +1091,10 @@
       
       // Position windows in different locations
       const positions = [
-        { left: '30%', top: '40%' },
-        { left: '50%', top: '50%' },
-        { left: '70%', top: '60%' }
+        { left: '20%', top: '30%' },
+        { left: '40%', top: '40%' },
+        { left: '60%', top: '50%' },
+        { left: '30%', top: '35%' } // Position for blog window
       ];
       
       windows.forEach(function(window, index) {
@@ -767,6 +1126,11 @@
         toggleAppWindow(document.getElementById('window3'));
       });
       
+      document.getElementById('blogApp').addEventListener('click', function() {
+        // Open blog window instead of fullscreen page
+        toggleAppWindow(document.getElementById('blogWindow'));
+      });
+      
       // Set up window controls and dragging
       setupWindowControls();
     }
@@ -796,11 +1160,60 @@
     // Setup window controls and dragging in MacOS interface
     function setupWindowControls() {
       const windows = document.querySelectorAll('.app-window');
+      const display = document.querySelector('.display');
+      let displayBounds = null;
+      
+      // Cache display boundaries once
+      function updateDisplayBounds() {
+        const rect = display.getBoundingClientRect();
+        displayBounds = {
+          width: rect.width,
+          height: rect.height,
+          menuBarHeight: 25
+        };
+      }
+      
+      // Update bounds initially and on resize
+      updateDisplayBounds();
+      window.addEventListener('resize', updateDisplayBounds);
       
       windows.forEach(function(window) {
         const header = window.querySelector('.window-header');
         let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
+        let startX, startY, initialX, initialY;
+        let animationId = null;
+        let windowBounds = null;
+        
+        // Cache window bounds when drag starts
+        function cacheWindowBounds() {
+          const rect = window.getBoundingClientRect();
+          windowBounds = {
+            width: rect.width,
+            height: rect.height
+          };
+        }
+        
+        // Optimized position update using transform and RAF
+        function updatePosition(x, y) {
+          // Cancel previous animation frame
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+          
+          animationId = requestAnimationFrame(() => {
+            // Apply bounds checking
+            const maxX = displayBounds.width - windowBounds.width;
+            const maxY = displayBounds.height - windowBounds.height;
+            
+            const clampedX = Math.max(0, Math.min(x, maxX));
+            const clampedY = Math.max(displayBounds.menuBarHeight, Math.min(y, maxY));
+            
+            // Use transform for hardware acceleration
+            window.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+            window.style.left = 'auto';
+            window.style.top = 'auto';
+          });
+        }
         
         // Setup dragging
         header.addEventListener('mousedown', function(e) {
@@ -809,68 +1222,69 @@
             return;
           }
           
-          // Prevent default behaviors
           e.preventDefault();
-          
           isDragging = true;
           
-          // Store initial mouse position
+          // Cache bounds for performance
+          cacheWindowBounds();
+          
+          // Store initial positions
           startX = e.clientX;
           startY = e.clientY;
           
-          // Store initial window position
-          initialLeft = parseInt(window.style.left) || parseInt(window.offsetLeft);
-          initialTop = parseInt(window.style.top) || parseInt(window.offsetTop);
+          // Get current transform values or use current position
+          const currentTransform = window.style.transform;
+          if (currentTransform && currentTransform.includes('translate')) {
+            const values = currentTransform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+            if (values) {
+              initialX = parseFloat(values[1]);
+              initialY = parseFloat(values[2]);
+            }
+          } else {
+            initialX = parseInt(window.style.left) || 0;
+            initialY = parseInt(window.style.top) || 0;
+          }
           
-          // Make this window active
+          // Make window active
           makeWindowActive(window);
           
           // Visual feedback
           header.style.cursor = 'grabbing';
           document.body.style.userSelect = 'none';
           
-          // Attach mouse move and up events to document
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
+          // Attach optimized event listeners
+          document.addEventListener('mousemove', onMouseMove, { passive: false });
+          document.addEventListener('mouseup', onMouseUp, { passive: true });
         });
         
+        // Optimized mouse move handler
         function onMouseMove(e) {
           if (!isDragging) return;
           
           e.preventDefault();
           
-          // Calculate how far the mouse has moved
+          // Calculate delta movement
           const deltaX = e.clientX - startX;
           const deltaY = e.clientY - startY;
           
           // Calculate new position
-          let newLeft = initialLeft + deltaX;
-          let newTop = initialTop + deltaY;
+          const newX = initialX + deltaX;
+          const newY = initialY + deltaY;
           
-          // Get display boundaries
-          const display = document.querySelector('.display');
-          const displayRect = display.getBoundingClientRect();
-          const windowRect = window.getBoundingClientRect();
-          
-          // Boundary checks
-          const minLeft = 0;
-          const minTop = 25; // Account for menu bar
-          const maxLeft = displayRect.width - windowRect.width;
-          const maxTop = displayRect.height - windowRect.height;
-          
-          newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
-          newTop = Math.max(minTop, Math.min(newTop, maxTop));
-          
-          // Apply position immediately
-          window.style.left = newLeft + 'px';
-          window.style.top = newTop + 'px';
-          window.style.transform = 'none';
+          // Update position using RAF for smoothness
+          updatePosition(newX, newY);
         }
         
         function onMouseUp(e) {
           if (!isDragging) return;
           
           isDragging = false;
+          
+          // Cancel any pending animation
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+          }
           
           // Reset styles
           header.style.cursor = '';
@@ -926,6 +1340,79 @@
       
       // Make sure this window is active
       makeWindowActive(window);
+    }
+    
+    // Setup blog page functionality
+    function setupBlogPage() {
+      // Use a more robust element detection approach
+      const checkElements = () => {
+        const blogApp = document.getElementById('blogApp');
+        const blogPage = document.getElementById('blogPage');
+        const blogClose = document.getElementById('blogClose');
+        
+        console.log('Checking blog elements:', {
+          blogApp: !!blogApp,
+          blogPage: !!blogPage, 
+          blogClose: !!blogClose,
+          macosVisible: document.getElementById('macosInterface').classList.contains('show')
+        });
+        
+        return blogApp && blogPage && blogClose;
+      };
+      
+      // Retry logic with exponential backoff
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      const initializeBlog = () => {
+        if (checkElements()) {
+          const blogApp = document.getElementById('blogApp');
+          const blogPage = document.getElementById('blogPage');
+          const blogClose = document.getElementById('blogClose');
+          
+          // Note: blogApp click handler is now in initializeAppWindows()
+          
+          // Close blog page
+          blogClose.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Blog close clicked');
+            blogPage.classList.remove('show');
+          });
+          
+          // Close blog page with Escape key
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && blogPage.classList.contains('show')) {
+              blogPage.classList.remove('show');
+            }
+          });
+          
+          // Add click animations to blog posts
+          const blogPosts = document.querySelectorAll('.blog-post');
+          blogPosts.forEach(function(post) {
+            post.addEventListener('click', function() {
+              // Add a subtle click animation
+              post.style.transform = 'translateY(-2px) scale(0.98)';
+              setTimeout(() => {
+                post.style.transform = 'translateY(-2px)';
+              }, 150);
+            });
+          });
+          
+          console.log('Blog functionality initialized successfully');
+        } else {
+          attempts++;
+          if (attempts < maxAttempts) {
+            const delay = Math.min(100 * Math.pow(2, attempts), 2000); // Exponential backoff, max 2s
+            console.log(`Blog elements not ready, retrying in ${delay}ms (attempt ${attempts}/${maxAttempts})`);
+            setTimeout(initializeBlog, delay);
+          } else {
+            console.error('Failed to initialize blog after', maxAttempts, 'attempts');
+          }
+        }
+      };
+      
+      // Start initialization
+      initializeBlog();
     }
   </script>
 </body>
