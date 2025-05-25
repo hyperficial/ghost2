@@ -862,7 +862,7 @@
       <div class="macbook-screen">
         <div class="display">
           <div class="menu-bar">
-            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/lol.svg"> </div>
+            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/download.svg"> </div>
             <div class="menu-item">Blog</div>
             <div class="menu-item">AI chat</div>
             <div class="menu-item">Contact</div>
@@ -937,9 +937,9 @@
               
               <div class="blog-posts-container">
                 <article class="blog-post-compact">
-                  <div class="blog-post-date">January 24, 2025</div>
+                  <div class="blog-post-date">May 25th 2025</div>
                   <h2 class="blog-post-title-compact">Example</h2>
-                  <p class="blog-post-excerpt-compact">idk what to write here</p>
+                  <p class="blog-post-excerpt-compact">examplem post, dont know what to write yet</p>
                   <div class="blog-post-tags">
                     <span class="blog-tag-compact">Example</span>
                     <span class="blog-tag-compact">Demo</span>
@@ -1089,23 +1089,33 @@
       // Set initial window properties for each window
       const windows = document.querySelectorAll('.app-window');
       
-      // Position windows in different locations
-      const positions = [
-        { left: '20%', top: '30%' },
-        { left: '40%', top: '40%' },
-        { left: '60%', top: '50%' },
-        { left: '30%', top: '35%' } // Position for blog window
+      // Position windows in different locations with proper initial setup
+      const windowConfigs = [
+        { id: 'window1', left: '25%', top: '30%' },
+        { id: 'window2', left: '45%', top: '40%' },
+        { id: 'window3', left: '65%', top: '50%' },
+        { id: 'blogWindow', left: '35%', top: '25%' }
       ];
       
-      windows.forEach(function(window, index) {
-        // Set initial position
-        if (positions[index]) {
-          window.style.left = positions[index].left;
-          window.style.top = positions[index].top;
-        }
+      windows.forEach(function(window) {        
+        // Find the config for this window
+        const config = windowConfigs.find(c => c.id === window.id);
         
+        // Set initial properties
         window.style.display = 'none';
         window.style.position = 'absolute';
+        
+        // Set initial position with proper transform reset
+        if (config) {
+          window.style.left = config.left;
+          window.style.top = config.top;
+          window.style.transform = 'none';
+        } else {
+          // Fallback positioning
+          window.style.left = '50%';
+          window.style.top = '50%';
+          window.style.transform = 'translate(-50%, -50%)';
+        }
         
         // Make the window active when clicked
         window.addEventListener('mousedown', function() {
@@ -1153,6 +1163,22 @@
       } else {
         // Show the window (no longer hiding other windows)
         window.style.display = 'block';
+        
+        // Ensure proper positioning when opening
+        const windowId = window.id;
+        const configs = {
+          'window1': { left: '25%', top: '30%' },
+          'window2': { left: '45%', top: '40%' },
+          'window3': { left: '65%', top: '50%' },
+          'blogWindow': { left: '35%', top: '25%' }
+        };
+        
+        if (configs[windowId]) {
+          window.style.left = configs[windowId].left;
+          window.style.top = configs[windowId].top;
+          window.style.transform = 'none';
+        }
+        
         makeWindowActive(window);
       }
     }
@@ -1321,13 +1347,26 @@
     // Toggle fullscreen mode for a window
     function toggleFullscreen(window) {
       if (window.classList.contains('fullscreen')) {
-        // Exit fullscreen mode
+        // Exit fullscreen mode - restore to original position
         window.classList.remove('fullscreen');
         
-        // Reset position
-        window.style.left = '50%';
-        window.style.top = '50%';
-        window.style.transform = 'translate(-50%, -50%)';
+        // Restore to specific position based on window ID
+        const windowId = window.id;
+        const configs = {
+          'window1': { left: '25%', top: '30%' },
+          'window2': { left: '45%', top: '40%' },
+          'window3': { left: '65%', top: '50%' },
+          'blogWindow': { left: '35%', top: '25%' }
+        };
+        
+        if (configs[windowId]) {
+          window.style.left = configs[windowId].left;
+          window.style.top = configs[windowId].top;
+        } else {
+          window.style.left = '50%';
+          window.style.top = '50%';
+        }
+        window.style.transform = 'none';
       } else {
         // Enter fullscreen mode
         window.classList.add('fullscreen');
