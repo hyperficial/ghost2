@@ -862,7 +862,7 @@
       <div class="macbook-screen">
         <div class="display">
           <div class="menu-bar">
-            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/lol.svg"> </div>
+            <div class="apple-logo"> <img style="width:20px; height: 20px" src="src/zxczerererrrrrrrgfjjjjjjjdhskdownload.svg"> </div>
             <div class="menu-item">Blog</div>
             <div class="menu-item">AI chat</div>
             <div class="menu-item">Contact</div>
@@ -884,8 +884,7 @@
               <div class="window-title">App 1</div>
             </div>
             <div class="window-content">
-              <h2>App 1 Content</h2>
-              <p>This is the content area for App 1.</p>
+               <iframe src="https://ghostlol.art" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
           </div>
 
@@ -983,38 +982,10 @@
       }, 1000);
     });
     
-    // Terminal input handling
+       // Terminal input handling
     const terminalInput = document.getElementById('terminalInput');
     const terminalOutput = document.getElementById('terminalOutput');
     const terminalBody = document.getElementById('terminalBody');
-    const cursor = document.getElementById('cursor');
-    
-    // Function to update cursor position
-    function updateCursorPosition() {
-      const inputValue = terminalInput.value;
-      const cursorPosition = terminalInput.selectionStart;
-      
-      // Create a canvas to measure text width more accurately
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      context.font = '16px "Courier New", monospace';
-      
-      // Measure the width of text before cursor
-      const textBeforeCursor = inputValue.substring(0, cursorPosition);
-      const textWidth = context.measureText(textBeforeCursor).width;
-      
-      // Position the cursor
-      cursor.style.left = textWidth + 'px';
-    }
-    
-    // Update cursor position on input and cursor movement
-    terminalInput.addEventListener('input', updateCursorPosition);
-    terminalInput.addEventListener('keyup', updateCursorPosition);
-    terminalInput.addEventListener('click', updateCursorPosition);
-    terminalInput.addEventListener('focus', updateCursorPosition);
-    
-    // Initial cursor position
-    updateCursorPosition();
     
     terminalInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -1040,9 +1011,6 @@
             
             // Initialize app windows
             initializeAppWindows();
-            
-            // No need for separate blog setup since it's now a regular window
-            // setupBlogPage();
           }, 1000);
         } 
         else if (command === 'help') {
